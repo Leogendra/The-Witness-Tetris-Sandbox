@@ -1,0 +1,80 @@
+{
+    "pieces": [
+        {
+            "id": "L",
+            "enabled": true,
+            "pattern": [
+                [0, 0, 1],
+                [1, 1, 1]
+            ]
+        },
+        {
+            "id": "J",
+            "enabled": true,
+            "pattern": [
+                [1, 0, 0],
+                [1, 1, 1]
+            ]
+        },
+        {
+            "id": "L4",
+            "enabled": true,
+            "pattern": [
+                [0, 0, 0, 1],
+                [1, 1, 1, 1]
+            ]
+        },
+        {
+            "id": "J4",
+            "enabled": true,
+            "pattern": [
+                [1, 0, 0, 0],
+                [1, 1, 1, 1]
+            ]
+        },
+        {
+            "id": "1x1",
+            "enabled": true,
+            "pattern": [
+                [1]
+            ]
+        },
+        {
+            "id": "2x1",
+            "enabled": true,
+            "pattern": [
+                [1, 1]
+            ]
+        },
+        {
+            "id": "3x1",
+            "enabled": true,
+            "pattern": [
+                [1, 1, 1]
+            ]
+        },
+        {
+            "id": "4x1",
+            "enabled": true,
+            "pattern": [
+                [1, 1, 1, 1]
+            ]
+        },
+        {
+            "id": "L3",
+            "enabled": true,
+            "pattern": [
+                [1, 0],
+                [1, 1]
+            ]
+        },
+        {
+            "id": "2x2",
+            "enabled": true,
+            "pattern": [
+                [1, 1],
+                [1, 1]
+            ]
+        }
+    ]
+}
