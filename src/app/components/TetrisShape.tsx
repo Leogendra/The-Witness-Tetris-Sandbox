@@ -35,10 +35,11 @@ interface TetrisShapeProps {
 }
 
 
-export const TetrisShape: React.FC<TetrisShapeProps> = ({ type, color, pattern, pieceId, onRemove, onRotate, style }) => {
-    const dragStartOffsetRef = React.useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+export const TetrisShape = React.forwardRef<HTMLDivElement, TetrisShapeProps>(
+    ({ type, color, pattern, pieceId, onRemove, onRotate, style }, forwardedRef) => {
+        const dragStartOffsetRef = React.useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
-    const [{ isDragging }, drag, preview] = useDrag(() => ({
+        const [{ isDragging }, drag, preview] = useDrag(() => ({
         type: 'tetromino',
         item: (monitor) => {
             const initialOffset = monitor.getInitialClientOffset();
@@ -78,25 +79,30 @@ export const TetrisShape: React.FC<TetrisShapeProps> = ({ type, color, pattern, 
             <div className="flex flex-col gap-0.5" style={{ lineHeight: 0 }}>
                 {pattern.map((row, i) => (
                     <div key={i} className="flex gap-0.5">
-                        {row.map((cell, j) => (
-                            <div
-                                key={j}
-                                className="rounded-sm"
-                                style={{
-                                    width: 'var(--cell-size, 33px)',
-                                    height: 'var(--cell-size, 33px)',
-                                    backgroundColor: cell ? color : 'transparent',
-                                    border: cell ? '1px solid #1a202c' : 'none',
-                                    boxSizing: 'border-box',
-                                }}
-                            />
-                        ))}
+                        {row.map((cell, j) =>
+                            cell ? (
+                                <div
+                                    key={j}
+                                    className="rounded-sm"
+                                    style={{
+                                        width: 'var(--cell-size, 33px)',
+                                        height: 'var(--cell-size, 33px)',
+                                        backgroundColor: color,
+                                        border: '1px solid #1a202c',
+                                        boxSizing: 'border-box',
+                                    }}
+                                />
+                            ) : null
+                        )}
                     </div>
                 ))}
             </div>
         </div>
     );
-};
+    }
+);
+
+TetrisShape.displayName = 'TetrisShape';
 
 
 export const TETROMINOS: Record<TetrominoType, { pattern: number[][], color: string }> =

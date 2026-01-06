@@ -1,16 +1,56 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { Grid } from './components/Grid';
 import { TETROMINOS, TetrominoType, getEnabledPieces } from './components/TetrisShape';
 import { PaletteShape } from './components/PaletteShape';
 import { GridProvider } from './components/GridContext';
+import { ShapeCreator, CustomPiece } from './components/ShapeCreator';
 
 export default function App() {
     const [gridSize, setGridSize] = useState<number>(5);
     const [editionMode, setEditionMode] = useState<boolean>(false);
+    const [customShapes, setCustomShapes] = useState<CustomPiece[]>([]);
+
+    // Load custom shapes from localStorage
+    useEffect(() => {
+        const saved = localStorage.getItem('customShapes');
+        if (saved) {
+            try {
+                setCustomShapes(JSON.parse(saved));
+            } catch (e) {
+                console.error('Failed to load custom shapes:', e);
+            }
+        }
+    }, []);
+
+    // Save custom shapes to localStorage
+    useEffect(() => {
+        localStorage.setItem('customShapes', JSON.stringify(customShapes));
+    }, [customShapes]);
 
     const tetrominoTypes: TetrominoType[] = getEnabledPieces();
+
+    const handleSaveShape = (shape: CustomPiece) => {
+        setCustomShapes(prev => {
+            const existing = prev.findIndex(s => s.id === shape.id);
+            if (existing >= 0) {
+                const updated = [...prev];
+                updated[existing] = shape;
+                return updated;
+            }
+            return [...prev, shape];
+        });
+    };
+
+    const handleDeleteShape = (id: string) => {
+        setCustomShapes(prev => prev.filter(s => s.id !== id));
+    };
+
+    const handleEditShape = (shape: CustomPiece) => {
+        // Edit is handled by the ShapeCreator component
+        // This callback is just for consistency
+    };
 
     return (
         <DndProvider backend={HTML5Backend}>
@@ -60,19 +100,53 @@ export default function App() {
                             </div>
 
                             <div className="grid lg:grid-cols-2 gap-8">
-                                {/* Tetris shapes */}
-                                <div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        {tetrominoTypes.map((type) => (
-                                            <div key={type} className="flex flex-col items-center gap-2">
-                                                <PaletteShape
-                                                    type={type}
-                                                    color={TETROMINOS[type].color}
-                                                    initialPattern={TETROMINOS[type].pattern}
-                                                />
-                                            </div>
-                                        ))}
+                                {/* Tetris shapes and creator */}
+                                <div className="space-y-6">
+                                    <div>
+                                        <h3 className="text-lg font-semibold mb-4">Shapes</h3>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            {/* Custom Shapes First */}
+                                            {customShapes.map((shape) => (
+                                                <div key={shape.id} className="flex flex-col items-center gap-2 group relative">
+                                                    <PaletteShape
+                                                        type={shape.id}
+                                                        color={shape.color}
+                                                        initialPattern={shape.pattern}
+                                                    />
+                                                    {/* Delete button on hover */}
+                                                    <button
+                                                        onClick={() => {
+                                                            if (confirm('Delete this shape?')) {
+                                                                onDeleteShape(shape.id);
+                                                            }
+                                                        }}
+                                                        className="opacity-0 group-hover:opacity-100 absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 transition-all"
+                                                        title="Delete shape"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            ))}
+
+                                            {/* Preset Shapes */}
+                                            {tetrominoTypes.map((type) => (
+                                                <div key={type} className="flex flex-col items-center gap-2">
+                                                    <PaletteShape
+                                                        type={type}
+                                                        color={TETROMINOS[type].color}
+                                                        initialPattern={TETROMINOS[type].pattern}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
+
+                                    <ShapeCreator
+                                        onSaveShape={handleSaveShape}
+                                        onDeleteShape={handleDeleteShape}
+                                        onEditShape={handleEditShape}
+                                        existingShapes={customShapes}
+                                    />
                                 </div>
 
                                 {/* Grid */}
@@ -89,6 +163,7 @@ export default function App() {
                                     <li>• Toggle edition mode to draw walls on grid edges, or markers on cells</li>
                                     <li>• Drag shapes to move them or drag outside to remove</li>
                                     <li>• Click shapes to rotate them 90°</li>
+                                    <li>• Click "Create new shape" to build custom shapes by clicking cells</li>
                                 </ul>
                             </div>
                         </div>
