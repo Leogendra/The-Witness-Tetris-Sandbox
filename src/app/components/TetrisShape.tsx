@@ -58,7 +58,7 @@ export const TetrisShape = React.forwardRef<HTMLDivElement, TetrisShapeProps>(
             collect: (monitor) => ({
                 isDragging: !!monitor.isDragging(),
             }),
-        }));
+        }), [type, pattern, pieceId, color, onRemove]);
 
         const setRefs = React.useCallback((node: HTMLDivElement | null) => {
             drag(node);
